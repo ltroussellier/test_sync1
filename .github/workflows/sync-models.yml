@@ -1,0 +1,47 @@
+name: Sync Models Directory
+on:
+  push:
+    branches:
+      - esgvoc  # Trigger on pushes to the "esgvoc" branch in Repo1
+    paths:
+      - '_src/wcrp-universe/models/**'  # Only trigger if changes occur in the "models" directory
+
+jobs:
+  sync-models:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Check out Repo1's "esgvoc" branch
+      - name: Checkout Repo1 (esgvoc branch)
+        uses: actions/checkout@v4
+        with:
+          ref: esgvoc  # Branch in Repo1
+          repository: ltroussellier/test_sync1  # Checkout Repo1 into a subdirectory
+
+
+      # Step 2: Check out Repo2's "main" branch
+      - name: Checkout Repo2 (main branch)
+        uses: actions/checkout@v4
+        with:
+          repository: ltroussellier/test_sync2  # Replace with Repo2's name
+          ref: master  # Branch in Repo2
+          token: ${{ secrets.SYNC1_PAT }}  # PAT with repo permissions
+
+      # Step 3: Copy the "models" directory from Repo1 to Repo2
+      - name: Copy Models Directory
+        run: |
+          # Delete the old "models" directory in Repo2 (if path differs)
+          rm -rf test_sync2/src/esgvoc/api/data_descriptors  # ⚠️ Update this path to match Repo2's structure
+
+          # Create the target directory in Repo2 (if needed)
+          mkdir -p test_sync2/src/esgvoc/api/data_descriptors
+          # Copy files from Repo1's "models" to Repo2's target directory
+          cp -r test_sync1/_src/wcrp-universe/models/* test_sync2/src/esgvoc/api/data_descriptors
+      # Step 4: Commit and push changes to Repo2
+      - name: Push to Repo2
+        run: |
+          cd test_sync2
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "chore: sync models directory from Repo1/esgvoc"
+          git push
