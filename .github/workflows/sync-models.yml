@@ -10,27 +10,22 @@ jobs:
   sync-models:
     runs-on: ubuntu-latest
     steps:
-# Step 1: Check out Repo1's "esgvoc" branch
-      - name: Checkout Repo1 (esgvoc branch)
-        uses: actions/checkout@v4
-        with:
-          ref: esgvoc  # Branch in Repo1
-          repository: ltroussellier/test_sync1  # Checkout Repo1 into a subdirectory
+      # Step 1: Check out Repo1's "esgvoc" branch
+      
+      - name: Clone Repo1 (esgvoc branch)
+        run: |
+          git clone --branch esgvoc https://x-access-token:${{ secrets.SYNC1_PAT }}@github.com/ltroussellier/test_sync1.git
+        # Uses Repo1's PAT (stored in Repo1's secrets)
 
-
-      # Step 2: Check out Repo2's "main" branch
-      - name: Checkout Repo2 (main branch)
-        uses: actions/checkout@v4
-        with:
-          repository: ltroussellier/test_sync2  # Replace with Repo2's name
-          ref: master  # Branch in Repo2
-          token: ${{ secrets.SYNC1_PAT }}  # PAT with repo permissions
-
+      - name: Clone Repo2 (main branch)
+        run: |
+          git clone --branch master https://x-access-token:${{ secrets.SYNC1_PAT }}@github.com/ltroussellier/test_sync2.git
+        # Uses Repo2's PAT (stored in Repo1's secrets)
       # Step 3: Copy the "models" directory from Repo1 to Repo2
       - name: Copy Models Directory
         run: |
           # Delete the old "models" directory in Repo2 (if path differs)
-          tree ../.
+          tree .
           
           rm -rf test_sync2/src/esgvoc/api/data_descriptors  # ⚠️ Update this path to match Repo2's structure
 
