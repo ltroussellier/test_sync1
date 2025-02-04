@@ -10,7 +10,7 @@ jobs:
   sync-models:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Check out Repo1's "esgvoc" branch
+# Step 1: Check out Repo1's "esgvoc" branch
       - name: Checkout Repo1 (esgvoc branch)
         uses: actions/checkout@v4
         with:
@@ -30,7 +30,7 @@ jobs:
       - name: Copy Models Directory
         run: |
           # Delete the old "models" directory in Repo2 (if path differs)
-          tree .
+          tree ../.
           
           rm -rf test_sync2/src/esgvoc/api/data_descriptors  # ⚠️ Update this path to match Repo2's structure
 
